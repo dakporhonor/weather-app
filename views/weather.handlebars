@@ -1,17 +1,45 @@
+<header class="py-2 bg-dark text-white text-center">
+  <h1>Weather Info</h1>
+  <p>Get the latest and accurate weather information</p>
+  <small>{{formatDate date 'MMMM Do YYYY'}}</small>
+</header>
+
 <div class="row">
-  <div class="col-md-6">
-    <form action="/" method="post">
-      <div class="form-group">
+  <div class="col-md-4">
+  </div>
+  <div class="col-md-4">
+    <form action="/" method="post" class="form-inline my-3">
+      <div class="form-group py-3">
         <label for="address">Address</label>
-        <input type="text" name="address" placeholder="Enter Location">
+        <input class="form-control m-2" type="text" name="address" placeholder="Enter Location">
       </div>
-      <input type="submit" class="btn btn-primary">
+      <input type="submit" class="btn btn-outline-info">
     </form>
   </div>
 </div>
 
+<div class="row">
+  <div class="col">
+    <div class="card card-body bg-dark text-white text-center mx-auto">
+      {{#if dailySummary}}
+      <h3 class="card-title">Current Weather Info for {{location}}</h3>
 
-<h1>Weather {{dailySummary}}</h1>
-<p>The temperature is {{currently.temperature}}</p>
+      <p>{{dailySummary}} The temperature is {{currently.temperature}} Degrees Celcius, There is a
+        {{currently.precipProbability}}%
+        chance of rain!</p>
+      <p>Below are other useful weather parameters:</p>
+      <div class="card card-body text-dark text-center">
+        <ul class="list-unstyled ">
+          <li>Humidity: {{currently.humidity}}%</li>
+          <li>Air Pressure: {{currently.pressure}} Hectopascals.</li>
+          <li>Wind Speed: {{currently.windSpeed}} Meters per second.</li>
+          <li>Visibility: {{currently.visibility}} Kilometers.</li>
+        </ul>
+      </div>
+      {{else}}
 
-{{error}}
+      {{/if}}
+      {{error}}
+    </div>
+  </div>
+</div>

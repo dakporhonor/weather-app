@@ -4,20 +4,33 @@ const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 const exphbs = require("express-handlebars");
+const moment = require("moment");
 
 const forecast = require("./utils/forecast");
 const geolocation = require("./utils/geolocation");
 
 const port = process.env.PORT || 5000;
-
+const staticPath = path.join(__dirname, "../public");
+console.log(staticPath);
 const app = express();
+app.use(express.static(staticPath));
 app.use(
   bodyParser.urlencoded({
     extended: false
   })
 );
 
-app.engine("handlebars", exphbs());
+app.engine(
+  "handlebars",
+  exphbs({
+    helpers: {
+      formatDate: function(date, format) {
+        return moment(date).format(format);
+      }
+    },
+    defaultLayout: "main"
+  })
+);
 app.set("view engine", "handlebars");
 
 app.get("/", (req, res) => {
@@ -43,11 +56,7 @@ app.post("/", (req, res) => {
     });
   }
 
-  geolocation(address, (error, {
-    latitude,
-    longitude,
-    location
-  }) => {
+  geolocation(address, (error, { latitude, longitude, location }) => {
     if (error) {
       return res.render("weather", {
         error
@@ -59,19 +68,18 @@ app.post("/", (req, res) => {
       latitude,
       longitude,
       location,
-      (error, {
-        currently,
-        dailySummary
-      } = {}) => {
+      (error, { currently, dailySummary } = {}) => {
         if (error) {
           return res.render("weather", {
             error
           });
         }
-        console.log(currently);
+        const date = Date().now;
         res.render("weather", {
           dailySummary,
-          currently
+          currently,
+          location,
+          date
         });
       }
     );
@@ -79,16 +87,15 @@ app.post("/", (req, res) => {
 });
 
 app.get("/weather", (req, res) => {
-  res.render('weather');
-
+  res.render("weather");
 });
 
 app.get("/about", (req, res) => {
-  res.send("About");
+  res.render("about");
 });
 
 app.get("*", (req, res) => {
-  res.send("404. Page not found!");
+  res.render("404");
 });
 
 app.listen(port, () => {
